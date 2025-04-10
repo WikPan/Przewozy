@@ -7,5 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class PrzewozyApplication {
     public static void main(String[] args) {
         SpringApplication.run(PrzewozyApplication.class, args);
+        //TEST TEST Tomasz
     }
 }
