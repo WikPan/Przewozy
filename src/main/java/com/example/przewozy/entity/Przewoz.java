@@ -30,4 +30,21 @@ public class Przewoz {
     @ManyToOne
     @JoinColumn(name = "trasa_id")
     private Trasa trasa;
+
+
+    public LocalDate getData() {
+        return data;
+    }
+
+    public void setData(LocalDate data) {
+        this.data = data;
+    }
+
+    public LocalTime getGodzina() {
+        return godzina;
+    }
+
+    public void setGodzina(LocalTime godzina) {
+        this.godzina = godzina;
+    }
 }
