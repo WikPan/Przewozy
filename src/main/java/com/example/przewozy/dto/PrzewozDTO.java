@@ -5,11 +5,10 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class PrzewozDTO {
-    private LocalDate date;
-    private LocalTime time;
+    private LocalDate data;
+    private LocalTime godzina;
 }
 

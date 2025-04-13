@@ -1,6 +1,7 @@
 package com.example.przewozy.service;
 
 import com.example.przewozy.dto.PrzewozDTO;
+import com.example.przewozy.entity.Autobus;
 import com.example.przewozy.entity.Przewoz;
 import com.example.przewozy.repo.PrzewozRepository;
 import jakarta.annotation.PostConstruct;
@@ -48,14 +49,15 @@ public class PrzewozServiceImpl implements PrzewozService{
 
     @Override
     public List<Przewoz> findAll() {
+        Autobus autobus = new Autobus();
         return przewozRepository.findAll();
     }
 
     @Override
     public void createPrzewoz(PrzewozDTO przewozDTO){
         Przewoz thePrzewoz = new Przewoz();
-        thePrzewoz.setData(przewozDTO.getDate());
-        thePrzewoz.setGodzina(przewozDTO.getTime());
+        thePrzewoz.setData(przewozDTO.getData());
+        thePrzewoz.setGodzina(przewozDTO.getGodzina());
 
         przewozRepository.save(thePrzewoz);
     }
