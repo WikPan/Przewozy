@@ -21,5 +21,5 @@ public class Klient {
     private String email;
 
     @OneToMany(mappedBy = "klient")
-    private List<Przewoz> przewozy;
+    private List<Bilet> bilety;
 }

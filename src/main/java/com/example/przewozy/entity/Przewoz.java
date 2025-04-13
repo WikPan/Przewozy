@@ -5,11 +5,14 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class Przewoz {
 
     @Id
@@ -19,32 +22,14 @@ public class Przewoz {
     private LocalDate data;
     private LocalTime godzina;
 
-    @ManyToOne
-    @JoinColumn(name = "klient_id")
-    private Klient klient;
+    @OneToMany(mappedBy = "przewoz")
+    private List<Bilet> bilet;
 
     @ManyToOne
     @JoinColumn(name = "autobus_id")
-    private Autobusy autobus;
+    private Autobus autobus;
 
     @ManyToOne
     @JoinColumn(name = "trasa_id")
     private Trasa trasa;
-
-
-    public LocalDate getData() {
-        return data;
-    }
-
-    public void setData(LocalDate data) {
-        this.data = data;
-    }
-
-    public LocalTime getGodzina() {
-        return godzina;
-    }
-
-    public void setGodzina(LocalTime godzina) {
-        this.godzina = godzina;
-    }
 }

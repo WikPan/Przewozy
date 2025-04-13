@@ -11,16 +11,21 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-public class Trasa {
+public class Bilet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String punktStartowy;
-    private String punktDocelowy;
-    private double dystansKm;
+    private String miejsce;
+    private Integer cena;
+    private Boolean Status;
 
-    @OneToMany(mappedBy = "trasa")
-    private List<Przewoz> przewozy;
+    @ManyToOne
+    @JoinColumn(name = "przewoz_id")
+    private Przewoz przewoz;
+
+    @ManyToOne
+    @JoinColumn(name = "klient_id")
+    private Klient klient;
 }
