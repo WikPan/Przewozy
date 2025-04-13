@@ -1,5 +1,6 @@
 package com.example.przewozy.service;
 
+import com.example.przewozy.dto.PrzewozDTO;
 import com.example.przewozy.entity.Przewoz;
 import com.example.przewozy.repo.PrzewozRepository;
 import jakarta.annotation.PostConstruct;
@@ -40,14 +41,23 @@ public class PrzewozServiceImpl implements PrzewozService{
     }
 
     @Override
-    public Przewoz getPrzewoz(int id) {
+    public Przewoz findPrzewoz(int id) {
         return przewozRepository.findById((long) id)
                 .orElseThrow(() -> new RuntimeException("Przewoz not found"));
     }
 
     @Override
-    public List<Przewoz> getAll() {
+    public List<Przewoz> findAll() {
         return przewozRepository.findAll();
+    }
+
+    @Override
+    public void createPrzewoz(PrzewozDTO przewozDTO){
+        Przewoz thePrzewoz = new Przewoz();
+        thePrzewoz.setData(przewozDTO.getDate());
+        thePrzewoz.setGodzina(przewozDTO.getTime());
+
+        przewozRepository.save(thePrzewoz);
     }
 
 }
