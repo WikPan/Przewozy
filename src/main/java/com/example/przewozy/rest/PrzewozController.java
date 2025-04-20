@@ -2,7 +2,9 @@ package com.example.przewozy.rest;
 
 import com.example.przewozy.dto.PrzewozDTO;
 import com.example.przewozy.entity.*;
+import com.example.przewozy.repo.AutobusRepository;
 import com.example.przewozy.repo.PrzewozRepository;
+import com.example.przewozy.repo.TrasaRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
@@ -21,6 +23,12 @@ public class PrzewozController {
     @Autowired
     private PrzewozRepository przewozRepo;
 
+    @Autowired
+    private TrasaRepository trasaRepo;
+
+    @Autowired
+    private AutobusRepository autobusRepo;
+
     @PostConstruct
     private void generateData(){
         Przewoz przewoz1 = new Przewoz();
@@ -33,6 +41,21 @@ public class PrzewozController {
         przewoz2.setGodzina(LocalTime.of(10, 0));
 
         przewozRepo.save(przewoz2);
+
+        Trasa trasa = new Trasa();
+        trasa.setDystansKm(15);
+        trasa.setPunktDocelowy("kebab");
+        trasa.setPunktStartowy("babek");
+
+        trasaRepo.save(trasa);
+
+        Autobus auto = new Autobus();
+        auto.setMarka("hu");
+        auto.setModel("mod");
+        auto.setLiczbaMiejsc(15);
+        auto.setRokProdukcji(1243);
+
+        autobusRepo.save(auto);
     }
 
     @GetMapping

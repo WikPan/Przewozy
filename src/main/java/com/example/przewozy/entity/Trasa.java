@@ -1,5 +1,6 @@
 package com.example.przewozy.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,18 +10,17 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 public class Trasa {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     private String punktStartowy;
     private String punktDocelowy;
     private double dystansKm;
 
     @OneToMany(mappedBy = "trasa")
+    @JsonIgnore
     private List<Przewoz> przewozy;
 }

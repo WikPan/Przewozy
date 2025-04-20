@@ -1,5 +1,6 @@
 package com.example.przewozy.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +14,7 @@ public class Autobus {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     private String marka;
     private String model;
@@ -21,5 +22,6 @@ public class Autobus {
     private int rokProdukcji;
 
     @OneToMany(mappedBy = "autobus")
+    @JsonIgnore
     private List<Przewoz> przewozy;
 }
