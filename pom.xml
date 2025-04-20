@@ -12,7 +12,7 @@
 	<artifactId>Przewozy</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Przewozy</name>
-	<description>aplikacja kredytowa</description>
+	<description>Aplikacja do usług przewozów</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -61,8 +61,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>javax.annotation</groupId>
-			<artifactId>javax.annotation-api</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-hateoas</artifactId>
 		</dependency>
 
 	</dependencies>

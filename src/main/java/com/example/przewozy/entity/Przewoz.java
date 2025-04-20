@@ -15,7 +15,7 @@ public class Przewoz {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     private LocalDate data;
     private LocalTime godzina;
