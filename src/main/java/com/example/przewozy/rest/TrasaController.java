@@ -2,7 +2,6 @@ package com.example.przewozy.rest;
 
 import com.example.przewozy.dto.PrzewozDTO;
 import com.example.przewozy.dto.TrasaDTO;
-import com.example.przewozy.entity.Autobus;
 import com.example.przewozy.entity.Trasa;
 import com.example.przewozy.repo.TrasaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,4 +55,27 @@ public class TrasaController {
 
         return CollectionModel.of(przewozyDTO);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateTrasa(@PathVariable Integer id, @RequestBody Trasa updatedTrasa) {
+        return trasaRepo.findById(id).map(trasa -> {
+            trasa.setPunktStartowy(updatedTrasa.getPunktStartowy());
+            trasa.setPunktDocelowy(updatedTrasa.getPunktDocelowy());
+            trasa.setDystansKm(updatedTrasa.getDystansKm());
+
+            trasaRepo.save(trasa);
+            return ResponseEntity.ok("Zaktualizowano trasę o id: " + id);
+        }).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTrasa(@PathVariable Integer id) {
+        if (trasaRepo.existsById(id)) {
+            trasaRepo.deleteById(id);
+            return ResponseEntity.ok("Usunięto trasę o id: " + id);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }
