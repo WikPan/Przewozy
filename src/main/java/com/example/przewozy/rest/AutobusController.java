@@ -3,9 +3,7 @@ package com.example.przewozy.rest;
 import com.example.przewozy.dto.AutobusDTO;
 import com.example.przewozy.dto.PrzewozDTO;
 import com.example.przewozy.entity.Autobus;
-import com.example.przewozy.entity.Przewoz;
 import com.example.przewozy.repo.AutobusRepository;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
@@ -57,4 +55,28 @@ public class AutobusController {
 
         return CollectionModel.of(przewozyDTO);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateAutobus(@PathVariable Integer id, @RequestBody Autobus updatedAutobus) {
+        return autoRepo.findById(id).map(autobus -> {
+            autobus.setMarka(updatedAutobus.getMarka());
+            autobus.setModel(updatedAutobus.getModel());
+            autobus.setLiczbaMiejsc(updatedAutobus.getLiczbaMiejsc());
+            autobus.setRokProdukcji(updatedAutobus.getRokProdukcji());
+
+            autoRepo.save(autobus);
+            return ResponseEntity.ok("Zaktualizowano autobus o id: " + id);
+        }).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteAutobus(@PathVariable Integer id) {
+        if (autoRepo.existsById(id)) {
+            autoRepo.deleteById(id);
+            return ResponseEntity.ok("Usunięto autobus o id: " + id);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

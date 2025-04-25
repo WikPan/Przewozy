@@ -1,7 +1,9 @@
 package com.example.przewozy.rest;
 
 import com.example.przewozy.dto.PrzewozDTO;
-import com.example.przewozy.entity.*;
+import com.example.przewozy.entity.Autobus;
+import com.example.przewozy.entity.Przewoz;
+import com.example.przewozy.entity.Trasa;
 import com.example.przewozy.repo.AutobusRepository;
 import com.example.przewozy.repo.PrzewozRepository;
 import com.example.przewozy.repo.TrasaRepository;
@@ -90,13 +92,29 @@ public class PrzewozController {
         return przewoz.getTrasa();
     }
 
-    //@PutMapping("/przewozy")
-    //public void updatePrzewoz(@PathVariable int index){
-    //    przewozService.updatePrzewoz(index);
-    //}
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updatePrzewoz(@PathVariable Integer id, @RequestBody Przewoz updatedPrzewoz) {
+        return przewozRepo.findById(id)
+                .map(przewoz -> {
+                    przewoz.setData(updatedPrzewoz.getData());
+                    przewoz.setGodzina(updatedPrzewoz.getGodzina());
+                    przewoz.setAutobus(updatedPrzewoz.getAutobus());
+                    przewoz.setTrasa(updatedPrzewoz.getTrasa());
+                    przewozRepo.save(przewoz);
+                    return ResponseEntity.ok("Zaktualizowano przewóz o id: " + id);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
-    //@DeleteMapping("/przewozy/{index}")
-    //public void removePrzewoz(@PathVariable int index){
-    //    przewozService.deletePrzewoz(index);
-    //}
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletePrzewoz(@PathVariable Integer id) {
+        if (przewozRepo.existsById(id)) {
+            przewozRepo.deleteById(id);
+            return ResponseEntity.ok("Usunięto przewóz o id: " + id);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }
