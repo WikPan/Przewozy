@@ -1,4 +1,4 @@
-package com.example.przewozy.exceptionHandler;
+package com.example.przewozy.validation;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

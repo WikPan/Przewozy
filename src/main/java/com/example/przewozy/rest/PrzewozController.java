@@ -1,5 +1,6 @@
 package com.example.przewozy.rest;
 
+import com.example.przewozy.dto.CreatePrzewozDTO;
 import com.example.przewozy.dto.PrzewozDTO;
 import com.example.przewozy.entity.Autobus;
 import com.example.przewozy.entity.Przewoz;
@@ -8,6 +9,8 @@ import com.example.przewozy.repo.AutobusRepository;
 import com.example.przewozy.repo.PrzewozRepository;
 import com.example.przewozy.repo.TrasaRepository;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
@@ -33,16 +36,20 @@ public class PrzewozController {
 
     @PostConstruct
     private void generateData(){
-        Przewoz przewoz1 = new Przewoz();
-        przewoz1.setData(LocalDate.now());
-        przewoz1.setGodzina(LocalTime.now());
-        przewozRepo.save(przewoz1);
+        try {
+            Przewoz przewoz1 = new Przewoz();
+            przewoz1.setData(LocalDate.now());
+            przewoz1.setGodzina(LocalTime.now());
+            przewozRepo.save(przewoz1);
 
-        Przewoz przewoz2 = new Przewoz();
-        przewoz2.setData(LocalDate.now().plusDays(1));
-        przewoz2.setGodzina(LocalTime.of(10, 0));
+            Przewoz przewoz2 = new Przewoz();
+            przewoz2.setData(LocalDate.now().plusDays(1));
+            przewoz2.setGodzina(LocalTime.of(10, 0));
+            przewozRepo.save(przewoz2);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        przewozRepo.save(przewoz2);
 
         Trasa trasa = new Trasa();
         trasa.setDystansKm(15);
@@ -75,10 +82,22 @@ public class PrzewozController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createPrzewoz(@RequestBody Przewoz przewoz ){
-        przewoz = przewozRepo.save(przewoz);
+    public ResponseEntity<?> createPrzewoz(@Valid @RequestBody CreatePrzewozDTO dto) {
+        Autobus autobus = autobusRepo.findById(dto.getAutobusId())
+                .orElseThrow(() -> new EntityNotFoundException("Autobus o podanym ID nie istnieje"));
+        Trasa trasa = trasaRepo.findById(dto.getTrasaId())
+                .orElseThrow(() -> new EntityNotFoundException("Trasa o podanym ID nie istnieje"));
+
+        Przewoz przewoz = new Przewoz();
+        przewoz.setData(dto.getData());
+        przewoz.setGodzina(dto.getGodzina());
+        przewoz.setAutobus(autobus);
+        przewoz.setTrasa(trasa);
+
+        przewozRepo.save(przewoz);
         return ResponseEntity.ok("Dodano przewóz");
     }
+
 
     @GetMapping("/{id}/autobus")
     public Autobus getAutobusForPrzewoz(@PathVariable Integer id) {
