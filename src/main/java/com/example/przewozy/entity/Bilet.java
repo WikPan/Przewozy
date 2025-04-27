@@ -1,31 +1,32 @@
 package com.example.przewozy.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import com.example.przewozy.enums.StatusBiletu;
 
-import java.util.List;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 public class Bilet {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String miejsce;
-    private Integer cena;
-    private Boolean Status;
+    @ManyToOne
+    @JoinColumn(name = "klient_id")
+    private Klient klient;
 
     @ManyToOne
     @JoinColumn(name = "przewoz_id")
     private Przewoz przewoz;
 
-    @ManyToOne
-    @JoinColumn(name = "klient_id")
-    private Klient klient;
+    private String miejsce;
+    private Integer cena;
+
+    @Enumerated(EnumType.STRING)
+    private StatusBiletu status;
 }

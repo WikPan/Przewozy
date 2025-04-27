@@ -73,10 +73,26 @@ public class PrzewozController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createPrzewoz(@RequestBody Przewoz przewoz ){
-        przewoz = przewozRepo.save(przewoz);
+    public ResponseEntity<?> createPrzewoz(@RequestBody PrzewozDTO przewozDTO) {
+        Przewoz przewoz = new Przewoz();
+        przewoz.setData(przewozDTO.getData());
+        przewoz.setGodzina(przewozDTO.getGodzina());
+
+        Autobus autobus = autobusRepo.findById(przewozDTO.getAutobusId()).orElse(null);
+        Trasa trasa = trasaRepo.findById(przewozDTO.getTrasaId()).orElse(null);
+
+        if (autobus == null || trasa == null) {
+            return ResponseEntity.badRequest().body("Podano błędne ID autobusu lub trasy");
+        }
+
+        przewoz.setAutobus(autobus);
+        przewoz.setTrasa(trasa);
+
+        przewozRepo.save(przewoz);
+
         return ResponseEntity.ok("Dodano przewóz");
     }
+
 
     @GetMapping("/{id}/autobus")
     public Autobus getAutobusForPrzewoz(@PathVariable Integer id) {

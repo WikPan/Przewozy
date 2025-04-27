@@ -17,17 +17,20 @@ public class PrzewozDTO extends RepresentationModel<PrzewozDTO> {
     private Integer id;
     private LocalDate data;
     private LocalTime godzina;
+    private Integer autobusId;
+    private Integer trasaId;
 
     public PrzewozDTO(Przewoz przewoz) {
         super();
         this.id = przewoz.getId();
         this.data = przewoz.getData();
         this.godzina = przewoz.getGodzina();
+        this.autobusId = przewoz.getAutobus() != null ? przewoz.getAutobus().getId() : null;
+        this.trasaId = przewoz.getTrasa() != null ? przewoz.getTrasa().getId() : null;
+
         this.add(linkTo(methodOn(PrzewozController.class)
                 .getAutobusForPrzewoz(przewoz.getId())).withRel("autobus"));
         this.add(linkTo(methodOn(PrzewozController.class)
                 .getTrasaForPrzewoz(przewoz.getId())).withRel("trasa"));
     }
-
 }
-
