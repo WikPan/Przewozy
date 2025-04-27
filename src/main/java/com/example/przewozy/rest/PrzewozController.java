@@ -1,11 +1,16 @@
 package com.example.przewozy.rest;
 
+import com.example.przewozy.dto.CreatePrzewozDTO;
 import com.example.przewozy.dto.PrzewozDTO;
-import com.example.przewozy.entity.*;
+import com.example.przewozy.entity.Autobus;
+import com.example.przewozy.entity.Przewoz;
+import com.example.przewozy.entity.Trasa;
 import com.example.przewozy.repo.AutobusRepository;
 import com.example.przewozy.repo.PrzewozRepository;
 import com.example.przewozy.repo.TrasaRepository;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
@@ -31,16 +36,20 @@ public class PrzewozController {
 
     @PostConstruct
     private void generateData(){
-        Przewoz przewoz1 = new Przewoz();
-        przewoz1.setData(LocalDate.now());
-        przewoz1.setGodzina(LocalTime.now());
-        przewozRepo.save(przewoz1);
+        try {
+            Przewoz przewoz1 = new Przewoz();
+            przewoz1.setData(LocalDate.now());
+            przewoz1.setGodzina(LocalTime.now());
+            przewozRepo.save(przewoz1);
 
-        Przewoz przewoz2 = new Przewoz();
-        przewoz2.setData(LocalDate.now().plusDays(1));
-        przewoz2.setGodzina(LocalTime.of(10, 0));
+            Przewoz przewoz2 = new Przewoz();
+            przewoz2.setData(LocalDate.now().plusDays(1));
+            przewoz2.setGodzina(LocalTime.of(10, 0));
+            przewozRepo.save(przewoz2);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        przewozRepo.save(przewoz2);
 
         Trasa trasa = new Trasa();
         trasa.setDystansKm(15);
@@ -73,6 +82,7 @@ public class PrzewozController {
     }
 
     @PostMapping
+<<<<<<< HEAD
     public ResponseEntity<?> createPrzewoz(@RequestBody PrzewozDTO przewozDTO) {
         Przewoz przewoz = new Przewoz();
         przewoz.setData(przewozDTO.getData());
@@ -85,11 +95,25 @@ public class PrzewozController {
             return ResponseEntity.badRequest().body("Podano błędne ID autobusu lub trasy");
         }
 
+=======
+    public ResponseEntity<?> createPrzewoz(@Valid @RequestBody CreatePrzewozDTO dto) {
+        Autobus autobus = autobusRepo.findById(dto.getAutobusId())
+                .orElseThrow(() -> new EntityNotFoundException("Autobus o podanym ID nie istnieje"));
+        Trasa trasa = trasaRepo.findById(dto.getTrasaId())
+                .orElseThrow(() -> new EntityNotFoundException("Trasa o podanym ID nie istnieje"));
+
+        Przewoz przewoz = new Przewoz();
+        przewoz.setData(dto.getData());
+        przewoz.setGodzina(dto.getGodzina());
+>>>>>>> 3a0dcc8e89d4514bb1cefa41399b672f15c4b538
         przewoz.setAutobus(autobus);
         przewoz.setTrasa(trasa);
 
         przewozRepo.save(przewoz);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3a0dcc8e89d4514bb1cefa41399b672f15c4b538
         return ResponseEntity.ok("Dodano przewóz");
     }
 
@@ -106,13 +130,29 @@ public class PrzewozController {
         return przewoz.getTrasa();
     }
 
-    //@PutMapping("/przewozy")
-    //public void updatePrzewoz(@PathVariable int index){
-    //    przewozService.updatePrzewoz(index);
-    //}
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updatePrzewoz(@PathVariable Integer id, @RequestBody Przewoz updatedPrzewoz) {
+        return przewozRepo.findById(id)
+                .map(przewoz -> {
+                    przewoz.setData(updatedPrzewoz.getData());
+                    przewoz.setGodzina(updatedPrzewoz.getGodzina());
+                    przewoz.setAutobus(updatedPrzewoz.getAutobus());
+                    przewoz.setTrasa(updatedPrzewoz.getTrasa());
+                    przewozRepo.save(przewoz);
+                    return ResponseEntity.ok("Zaktualizowano przewóz o id: " + id);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
-    //@DeleteMapping("/przewozy/{index}")
-    //public void removePrzewoz(@PathVariable int index){
-    //    przewozService.deletePrzewoz(index);
-    //}
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletePrzewoz(@PathVariable Integer id) {
+        if (przewozRepo.existsById(id)) {
+            przewozRepo.deleteById(id);
+            return ResponseEntity.ok("Usunięto przewóz o id: " + id);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }
