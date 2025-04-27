@@ -91,10 +91,12 @@ public class PrzewozController {
         Przewoz przewoz = new Przewoz();
         przewoz.setData(dto.getData());
         przewoz.setGodzina(dto.getGodzina());
+
         przewoz.setAutobus(autobus);
         przewoz.setTrasa(trasa);
 
         przewozRepo.save(przewoz);
+
         return ResponseEntity.ok("Dodano przewóz");
     }
 
