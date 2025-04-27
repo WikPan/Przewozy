@@ -82,20 +82,6 @@ public class PrzewozController {
     }
 
     @PostMapping
-<<<<<<< HEAD
-    public ResponseEntity<?> createPrzewoz(@RequestBody PrzewozDTO przewozDTO) {
-        Przewoz przewoz = new Przewoz();
-        przewoz.setData(przewozDTO.getData());
-        przewoz.setGodzina(przewozDTO.getGodzina());
-
-        Autobus autobus = autobusRepo.findById(przewozDTO.getAutobusId()).orElse(null);
-        Trasa trasa = trasaRepo.findById(przewozDTO.getTrasaId()).orElse(null);
-
-        if (autobus == null || trasa == null) {
-            return ResponseEntity.badRequest().body("Podano błędne ID autobusu lub trasy");
-        }
-
-=======
     public ResponseEntity<?> createPrzewoz(@Valid @RequestBody CreatePrzewozDTO dto) {
         Autobus autobus = autobusRepo.findById(dto.getAutobusId())
                 .orElseThrow(() -> new EntityNotFoundException("Autobus o podanym ID nie istnieje"));
@@ -105,15 +91,12 @@ public class PrzewozController {
         Przewoz przewoz = new Przewoz();
         przewoz.setData(dto.getData());
         przewoz.setGodzina(dto.getGodzina());
->>>>>>> 3a0dcc8e89d4514bb1cefa41399b672f15c4b538
+
         przewoz.setAutobus(autobus);
         przewoz.setTrasa(trasa);
 
         przewozRepo.save(przewoz);
-<<<<<<< HEAD
 
-=======
->>>>>>> 3a0dcc8e89d4514bb1cefa41399b672f15c4b538
         return ResponseEntity.ok("Dodano przewóz");
     }
 
