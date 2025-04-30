@@ -1,8 +1,13 @@
 package com.example.przewozy.dto;
 
+import com.example.przewozy.entity.Autobus;
 import com.example.przewozy.entity.Przewoz;
+import com.example.przewozy.entity.Trasa;
 import com.example.przewozy.rest.PrzewozController;
-import lombok.*;
+import com.example.przewozy.validation.ExistsInDatabase;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.time.LocalDate;
@@ -15,9 +20,15 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @NoArgsConstructor
 public class PrzewozDTO extends RepresentationModel<PrzewozDTO> {
     private Integer id;
+    @NotNull
     private LocalDate data;
+    @NotNull
     private LocalTime godzina;
+    @NotNull
+    @ExistsInDatabase(entity = Autobus.class)
     private Integer autobusId;
+    @NotNull
+    @ExistsInDatabase(entity = Trasa.class)
     private Integer trasaId;
 
     public PrzewozDTO(Przewoz przewoz) {

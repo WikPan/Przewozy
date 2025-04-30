@@ -1,6 +1,5 @@
 package com.example.przewozy.rest;
 
-import com.example.przewozy.dto.CreatePrzewozDTO;
 import com.example.przewozy.dto.PrzewozDTO;
 import com.example.przewozy.entity.Autobus;
 import com.example.przewozy.entity.Przewoz;
@@ -82,7 +81,7 @@ public class PrzewozController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createPrzewoz(@Valid @RequestBody CreatePrzewozDTO dto) {
+    public ResponseEntity<?> createPrzewoz(@Valid @RequestBody PrzewozDTO dto) {
         Autobus autobus = autobusRepo.findById(dto.getAutobusId())
                 .orElseThrow(() -> new EntityNotFoundException("Autobus o podanym ID nie istnieje"));
         Trasa trasa = trasaRepo.findById(dto.getTrasaId())
