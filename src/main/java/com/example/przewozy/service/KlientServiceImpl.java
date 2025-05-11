@@ -3,57 +3,57 @@ package com.example.przewozy.service;
 import com.example.przewozy.dto.KlientDTO;
 import com.example.przewozy.entity.Klient;
 import com.example.przewozy.repo.KlientRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class KlientServiceImpl implements KlientService {
 
-    @Autowired
-    private KlientRepository klientRepo;
+    private final KlientRepository klientRepo;
 
     @Override
-    public List<Klient> findAll() {
-        return klientRepo.findAll();
+    public List<KlientDTO> findAll() {
+        return klientRepo.findAll().stream()
+                .map(KlientDTO::new)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Klient findById(Long id) {
-        return klientRepo.findById(id)
+    public KlientDTO findById(Long id) {
+        Klient k = klientRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Klient nie znaleziony: " + id));
+        return new KlientDTO(k);
     }
 
     @Override
-    public void create(KlientDTO dto) {
+    public KlientDTO create(KlientDTO dto) {
         Klient k = new Klient();
         k.setImie(dto.getImie());
         k.setNazwisko(dto.getNazwisko());
         k.setTelefon(dto.getTelefon());
         k.setEmail(dto.getEmail());
-        klientRepo.save(k);
+        Klient saved = klientRepo.save(k);
+        return new KlientDTO(saved);
     }
 
     @Override
-    public void update(Long id, KlientDTO dto) {
-        Klient k = findById(id);
+    public KlientDTO update(Long id, KlientDTO dto) {
+        Klient k = klientRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Klient nie znaleziony: " + id));
         k.setImie(dto.getImie());
         k.setNazwisko(dto.getNazwisko());
         k.setTelefon(dto.getTelefon());
         k.setEmail(dto.getEmail());
-        klientRepo.save(k);
+        Klient updated = klientRepo.save(k);
+        return new KlientDTO(updated);
     }
 
     @Override
     public void delete(Long id) {
         klientRepo.deleteById(id);
-    }
-
-    @Override
-    public Page<Klient> findAllPaged(Pageable pageable) {
-        return klientRepo.findAll(pageable);
     }
 }

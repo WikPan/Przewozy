@@ -1,53 +1,47 @@
 package com.example.przewozy.rest;
 
 import com.example.przewozy.dto.KlientDTO;
-import com.example.przewozy.entity.Klient;
 import com.example.przewozy.service.KlientService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/klienci")
+@RequiredArgsConstructor
 public class KlientRestController {
 
-    @Autowired
-    private KlientService klientService;
+    private final KlientService klientService;
 
     @GetMapping
-    public List<Klient> getAll() {
-        return klientService.findAll();
+    public ResponseEntity<List<KlientDTO>> getAll() {
+        return ResponseEntity.ok(klientService.findAll());
     }
 
     @GetMapping("/{id}")
-    public Klient getById(@PathVariable Long id) {
-        return klientService.findById(id);
+    public ResponseEntity<KlientDTO> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(klientService.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody KlientDTO dto) {
-        klientService.create(dto);
-        return ResponseEntity.ok("Dodano klienta");
+    public ResponseEntity<KlientDTO> create(@RequestBody @Valid KlientDTO klientDTO) {
+        KlientDTO created = klientService.create(klientDTO);
+        return ResponseEntity.ok(created);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody KlientDTO dto) {
-        klientService.update(id, dto);
-        return ResponseEntity.ok("Zaktualizowano klienta");
+    public ResponseEntity<KlientDTO> update(@PathVariable Long id,
+                                            @RequestBody @Valid KlientDTO klientDTO) {
+        KlientDTO updated = klientService.update(id, klientDTO);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         klientService.delete(id);
-        return ResponseEntity.ok("Usunięto klienta");
-    }
-
-    @GetMapping("/page")
-    public Page<Klient> getPaged(Pageable pageable) {
-        return klientService.findAllPaged(pageable);
+        return ResponseEntity.noContent().build();
     }
 }

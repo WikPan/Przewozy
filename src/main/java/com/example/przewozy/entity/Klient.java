@@ -5,10 +5,13 @@ import lombok.*;
 
 import java.util.List;
 
-@Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = "bilety")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Entity
 public class Klient {
 
     @Id

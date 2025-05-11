@@ -1,8 +1,10 @@
 package com.example.przewozy.repo;
 
 import com.example.przewozy.entity.Przewoz;
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
+
 import org.springframework.data.repository.CrudRepository;
 
 public interface PrzewozRepository extends CrudRepository<Przewoz, Integer> {
+	List<Przewoz> findByTrasaId(Integer trasaId);
 }
