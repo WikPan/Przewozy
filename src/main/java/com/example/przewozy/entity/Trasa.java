@@ -19,7 +19,7 @@ public class Trasa {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer id; 
 
     @NotBlank
     private String punktStartowy;

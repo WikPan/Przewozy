@@ -33,12 +33,10 @@ public class KlientDTO extends RepresentationModel<KlientDTO> {
     @Email(message = "Niepoprawny adres email")
     private String email;
 
-    /** Ten konstruktor przyjmuje tylko dane (bez id) – przydatny w testach */
     public KlientDTO(String imie, String nazwisko, String telefon, String email) {
         this(null, imie, nazwisko, telefon, email);
     }
 
-    /** Buduje DTO z encji i dokleja HATEOAS-owe linki */
     public KlientDTO(Klient k) {
         this.id = k.getId();
         this.imie = k.getImie();

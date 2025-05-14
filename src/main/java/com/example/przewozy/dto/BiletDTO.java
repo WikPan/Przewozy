@@ -35,7 +35,14 @@ public class BiletDTO extends RepresentationModel<BiletDTO> {
     @NotNull(message = "status nie może być pusty")
     private StatusBiletu status;
 
-    // Konstruktor z encji Bilet
+    public BiletDTO(Long klientId, Integer przewozId, String miejsce, Integer cena, StatusBiletu status) {
+        this.klientId = klientId;
+        this.przewozId = przewozId;
+        this.miejsce = miejsce;
+        this.cena = cena;
+        this.status = status;
+    }
+
     public BiletDTO(Bilet bilet) {
         this.id = bilet.getId();
         this.klientId = bilet.getKlient().getId();

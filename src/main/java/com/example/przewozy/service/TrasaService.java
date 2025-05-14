@@ -1,15 +1,15 @@
 package com.example.przewozy.service;
 
-import com.example.przewozy.dto.PrzewozDTO;
-import com.example.przewozy.dto.TrasaDTO;
+import com.example.przewozy.entity.Przewoz;
 import com.example.przewozy.entity.Trasa;
-import org.springframework.hateoas.CollectionModel;
+
+import java.util.List;
 
 public interface TrasaService {
-    CollectionModel<TrasaDTO> findAll();
-    TrasaDTO findById(Integer id);
-    String create(Trasa trasa);
-    CollectionModel<PrzewozDTO> getPrzewozyForTrasa(Integer id);
-    String update(Integer id, Trasa trasa);
-    String delete(Integer id);
+    List<Trasa> findAll();
+    Trasa findById(Integer id);
+    Trasa create(Trasa trasa);
+    Trasa update(Integer id, Trasa trasa);
+    void delete(Integer id);
+    List<Przewoz> getPrzewozyForTrasa(Integer id);
 }

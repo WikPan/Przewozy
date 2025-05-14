@@ -1,15 +1,12 @@
 package com.example.przewozy.service;
 
-import com.example.przewozy.dto.PrzewozDTO;
-import com.example.przewozy.dto.TrasaDTO;
+import com.example.przewozy.entity.Przewoz;
 import com.example.przewozy.entity.Trasa;
+import com.example.przewozy.exception.ResourceNotFoundException;
 import com.example.przewozy.repo.PrzewozRepository;
 import com.example.przewozy.repo.TrasaRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,58 +20,51 @@ public class TrasaServiceImpl implements TrasaService {
     private final PrzewozRepository przewozRepo;
 
     @Override
-    public CollectionModel<TrasaDTO> findAll() {
-        // zamiana Iterable<Trasa> na Stream<Trasa>
-        List<TrasaDTO> trasyDTO = StreamSupport.stream(trasaRepo.findAll().spliterator(), false)
-            .map(TrasaDTO::new)
-            .collect(Collectors.toList());
-        return CollectionModel.of(trasyDTO);
+    public List<Trasa> findAll() {
+        return StreamSupport.stream(trasaRepo.findAll().spliterator(), false)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public TrasaDTO findById(Integer id) {
-        Trasa trasa = trasaRepo.findById(id)
-            .orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Trasa nie znaleziona: " + id)
-            );
-        return new TrasaDTO(trasa);
-    }
-
-    @Override
-    public String create(Trasa trasa) {
-        trasaRepo.save(trasa);
-        return "Dodano trasę";
-    }
-
-    @Override
-    public CollectionModel<PrzewozDTO> getPrzewozyForTrasa(Integer trasaId) {
-        List<PrzewozDTO> przDTO = przewozRepo.findByTrasaId(trasaId).stream()
-            .map(PrzewozDTO::new)
-            .collect(Collectors.toList());
-        return CollectionModel.of(przDTO);
-    }
-
-    @Override
-    public String update(Integer id, Trasa updated) {
+    public Trasa findById(Integer id) {
         return trasaRepo.findById(id)
-            .map(orig -> {
-                orig.setPunktStartowy(updated.getPunktStartowy());
-                orig.setPunktDocelowy(updated.getPunktDocelowy());
-                orig.setDystansKm(updated.getDystansKm());
-                trasaRepo.save(orig);
-                return "Zaktualizowano trasę o id: " + id;
-            })
-            .orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Trasa nie znaleziona: " + id)
-            );
+                .orElseThrow(() ->
+                    new ResourceNotFoundException("Trasa nie znaleziona: " + id)
+                );
     }
 
     @Override
-    public String delete(Integer id) {
+    public Trasa create(Trasa trasa) {
+        return trasaRepo.save(trasa);
+    }
+
+    @Override
+    public Trasa update(Integer id, Trasa updated) {
+        return trasaRepo.findById(id)
+                .map(orig -> {
+                    orig.setPunktStartowy(updated.getPunktStartowy());
+                    orig.setPunktDocelowy(updated.getPunktDocelowy());
+                    orig.setDystansKm(updated.getDystansKm());
+                    return trasaRepo.save(orig);
+                })
+                .orElseThrow(() ->
+                    new ResourceNotFoundException("Trasa nie znaleziona: " + id)
+                );
+    }
+
+    @Override
+    public void delete(Integer id) {
         if (!trasaRepo.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Trasa nie znaleziona: " + id);
+            throw new ResourceNotFoundException("Trasa nie znaleziona: " + id);
         }
         trasaRepo.deleteById(id);
-        return "Usunięto trasę o id: " + id;
+    }
+
+    @Override
+    public List<Przewoz> getPrzewozyForTrasa(Integer id) {
+        // Rzuć 404 jeśli nie ma trasy
+        findById(id);
+        // Pobierz przewozy powiązane z tą trasą
+        return przewozRepo.findByTrasaId(id);
     }
 }
