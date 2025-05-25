@@ -1,20 +1,17 @@
 package com.example.przewozy.rest;
 
+import com.example.przewozy.assembler.BiletModelAssembler;
 import com.example.przewozy.dto.BiletDTO;
-import com.example.przewozy.dto.KlientDTO;
-import com.example.przewozy.dto.PrzewozDTO;
+import com.example.przewozy.entity.Bilet;
 import com.example.przewozy.service.BiletService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequestMapping("/bilety")
@@ -22,47 +19,47 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 public class BiletController {
 
     private final BiletService biletService;
+    private final BiletModelAssembler assembler;
 
     @GetMapping
-    public ResponseEntity<List<BiletDTO>> all() {
-        return ResponseEntity.ok(biletService.getAll());
+    public CollectionModel<BiletDTO> getAllBilety() {
+        List<Bilet> all = biletService.getAllEncje();
+        return assembler.toCollectionModel(all);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BiletDTO> getBilet(@PathVariable Long id) {
-        return ResponseEntity.ok(biletService.getById(id));
+    public BiletDTO getBilet(@PathVariable Long id) {
+        return biletService.getById(id);
     }
 
     @PostMapping
-    public ResponseEntity<BiletDTO> create(@RequestBody @Valid BiletDTO dto) {
+    public ResponseEntity<BiletDTO> createBilet(@Valid @RequestBody BiletDTO dto) {
         BiletDTO created = biletService.create(dto);
-        URI uri = ServletUriComponentsBuilder
-            .fromCurrentRequest()
-            .path("/{id}")
-            .buildAndExpand(created.getId())
-            .toUri();
-        return ResponseEntity.created(uri).body(created);
+        return ResponseEntity
+            .created(URI.create("/bilety/" + created.getId()))
+            .body(created);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BiletDTO> update(@PathVariable Long id, @RequestBody @Valid BiletDTO dto) {
-        return ResponseEntity.ok(biletService.update(id, dto));
+    public BiletDTO updateBilet(
+            @PathVariable Long id,
+            @Valid @RequestBody BiletDTO dto) {
+        return biletService.update(id, dto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    @ResponseStatus(code = org.springframework.http.HttpStatus.NO_CONTENT)
+    public void deleteBilet(@PathVariable Long id) {
         biletService.delete(id);
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/klient")
-    public KlientDTO getKlientForBilet(@PathVariable Long id) {
+    public Object getKlientForBilet(@PathVariable Long id) {
         return biletService.getKlientForBilet(id);
     }
 
     @GetMapping("/{id}/przewoz")
-    public PrzewozDTO getPrzewozForBilet(@PathVariable Long id) {
+    public Object getPrzewozForBilet(@PathVariable Long id) {
         return biletService.getPrzewozForBilet(id);
     }
 }
-

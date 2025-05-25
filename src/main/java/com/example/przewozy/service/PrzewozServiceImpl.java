@@ -4,11 +4,11 @@ import com.example.przewozy.dto.PrzewozDTO;
 import com.example.przewozy.entity.Autobus;
 import com.example.przewozy.entity.Przewoz;
 import com.example.przewozy.entity.Trasa;
+import com.example.przewozy.exception.ResourceNotFoundException;
 import com.example.przewozy.repo.AutobusRepository;
 import com.example.przewozy.repo.PrzewozRepository;
 import com.example.przewozy.repo.TrasaRepository;
 import jakarta.annotation.PostConstruct;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
@@ -73,16 +73,17 @@ public class PrzewozServiceImpl implements PrzewozService {
 
     @Override
     public PrzewozDTO getPrzewoz(Integer id) {
-        Przewoz p = przewozRepo.findById(id).orElse(null);
+        Przewoz p = przewozRepo.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Przewóz nie znaleziony: " + id));
         return new PrzewozDTO(p);
     }
 
     @Override
     public ResponseEntity<?> createPrzewoz(PrzewozDTO dto) {
         Autobus autobus = autobusRepo.findById(dto.getAutobusId())
-                .orElseThrow(() -> new EntityNotFoundException("Autobus o podanym ID nie istnieje"));
+            .orElseThrow(() -> new ResourceNotFoundException("Autobus nie znaleziony: " + dto.getAutobusId()));
         Trasa trasa = trasaRepo.findById(dto.getTrasaId())
-                .orElseThrow(() -> new EntityNotFoundException("Trasa o podanym ID nie istnieje"));
+            .orElseThrow(() -> new ResourceNotFoundException("Trasa nie znaleziona: " + dto.getTrasaId()));
 
         Przewoz przewoz = new Przewoz();
         przewoz.setData(dto.getData());
@@ -96,28 +97,30 @@ public class PrzewozServiceImpl implements PrzewozService {
 
     @Override
     public Autobus getAutobusForPrzewoz(Integer id) {
-        Przewoz przewoz = przewozRepo.findById(id).orElse(null);
-        return przewoz != null ? przewoz.getAutobus() : null;
+        Przewoz przewoz = przewozRepo.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Przewóz nie znaleziony: " + id));
+        return przewoz.getAutobus();
     }
 
     @Override
     public Trasa getTrasaForPrzewoz(Integer id) {
-        Przewoz przewoz = przewozRepo.findById(id).orElse(null);
-        return przewoz != null ? przewoz.getTrasa() : null;
+        Przewoz przewoz = przewozRepo.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Przewóz nie znaleziony: " + id));
+        return przewoz.getTrasa();
     }
 
     @Override
     public ResponseEntity<?> updatePrzewoz(Integer id, Przewoz updatedPrzewoz) {
         return przewozRepo.findById(id)
-                .map(przewoz -> {
-                    przewoz.setData(updatedPrzewoz.getData());
-                    przewoz.setGodzina(updatedPrzewoz.getGodzina());
-                    przewoz.setAutobus(updatedPrzewoz.getAutobus());
-                    przewoz.setTrasa(updatedPrzewoz.getTrasa());
-                    przewozRepo.save(przewoz);
-                    return ResponseEntity.ok("Zaktualizowano przewóz o id: " + id);
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+            .map(przewoz -> {
+                przewoz.setData(updatedPrzewoz.getData());
+                przewoz.setGodzina(updatedPrzewoz.getGodzina());
+                przewoz.setAutobus(updatedPrzewoz.getAutobus());
+                przewoz.setTrasa(updatedPrzewoz.getTrasa());
+                przewozRepo.save(przewoz);
+                return ResponseEntity.ok("Zaktualizowano przewóz o id: " + id);
+            })
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @Override
