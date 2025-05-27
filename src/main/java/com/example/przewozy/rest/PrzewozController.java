@@ -25,8 +25,10 @@ public class PrzewozController {
     }
 
     @GetMapping
-    public CollectionModel<PrzewozDTO> getPrzewozy() {
-        return przewozService.getPrzewozy();
+    public CollectionModel<PrzewozDTO> getPrzewozy(
+            @RequestParam(required = false) Integer trasaId,
+            @RequestParam(required = false) Integer autobusId) {
+        return przewozService.getPrzewozyByParams(trasaId, autobusId);
     }
 
     @GetMapping("/{id}")

@@ -63,6 +63,27 @@ public class PrzewozServiceImpl implements PrzewozService {
     }
 
     @Override
+    public CollectionModel<PrzewozDTO> getPrzewozyByParams(Integer trasaId, Integer autobusId) {
+        List<Przewoz> przewozy;
+
+        if (trasaId != null && autobusId != null) {
+            przewozy = ((List<Przewoz>) przewozRepo.findAll()).stream()
+                    .filter(p -> p.getTrasa() != null && p.getTrasa().getId().equals(trasaId))
+                    .filter(p -> p.getAutobus() != null && p.getAutobus().getId().equals(autobusId))
+                    .toList();
+        } else if (trasaId != null) {
+            przewozy = przewozRepo.findByTrasaId(trasaId);
+        } else if (autobusId != null) {
+            przewozy = przewozRepo.findByAutobusId(autobusId);
+        } else {
+            przewozy = (List<Przewoz>) przewozRepo.findAll();
+        }
+
+        List<PrzewozDTO> dtoList = przewozy.stream().map(PrzewozDTO::new).toList();
+        return CollectionModel.of(dtoList);
+    }
+
+    @Override
     public CollectionModel<PrzewozDTO> getPrzewozy() {
         List<PrzewozDTO> przewozyDTO = new ArrayList<>();
         for (Przewoz przewoz : przewozRepo.findAll()) {

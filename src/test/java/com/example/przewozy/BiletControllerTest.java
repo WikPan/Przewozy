@@ -176,16 +176,16 @@ class BiletControllerTest {
     @Test
     void createBilet_withMissingFields_shouldReturn400() throws Exception {
         BiletDTO bad = new BiletDTO();
-        // nie ustawiamy żadnych pól
 
         mockMvc.perform(post("/bilety")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(bad)))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.klientId").exists())
-            .andExpect(jsonPath("$.przewozId").exists())
-            .andExpect(jsonPath("$.miejsce").exists())
-            .andExpect(jsonPath("$.cena").exists())
-            .andExpect(jsonPath("$.status").exists());
+            .andExpect(jsonPath("$.errors.klientId").exists())
+            .andExpect(jsonPath("$.errors.przewozId").exists())
+            .andExpect(jsonPath("$.errors.miejsce").exists())
+            .andExpect(jsonPath("$.errors.cena").exists())
+            .andExpect(jsonPath("$.errors.status").exists());
     }
+
 }

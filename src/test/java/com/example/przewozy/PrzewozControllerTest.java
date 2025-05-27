@@ -137,8 +137,10 @@ class PrzewozControllerTest {
         mockMvc.perform(get("/przewozy/" + testPrzewoz.getId() + "/trasa"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.punktStartowy", is("Kraków")))
-            .andExpect(jsonPath("$.punktDocelowy", is("Warszawa")));
+            .andExpect(jsonPath("$.punktDocelowy", is("Warszawa")))
+            .andExpect(jsonPath("$.dystansKm", is(300.0)));
     }
+
 
     @Test
     void getPrzewozWithInvalidId_shouldReturn404() throws Exception {
@@ -148,7 +150,6 @@ class PrzewozControllerTest {
 
     @Test
     void createPrzewoz_withMissingFields_shouldReturn400() throws Exception {
-        // dto bez autobusId i trasaId
         PrzewozDTO bad = new PrzewozDTO();
         bad.setData(null);
         bad.setGodzina(null);
@@ -157,9 +158,10 @@ class PrzewozControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(bad)))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.data").exists())
-            .andExpect(jsonPath("$.godzina").exists())
-            .andExpect(jsonPath("$.autobusId").exists())
-            .andExpect(jsonPath("$.trasaId").exists());
+            .andExpect(jsonPath("$.errors.data").exists())
+            .andExpect(jsonPath("$.errors.godzina").exists())
+            .andExpect(jsonPath("$.errors.autobusId").exists())
+            .andExpect(jsonPath("$.errors.trasaId").exists());
     }
+
 }

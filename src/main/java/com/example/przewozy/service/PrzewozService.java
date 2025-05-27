@@ -14,6 +14,8 @@ public interface PrzewozService {
 
     CollectionModel<PrzewozDTO> getPrzewozy();
 
+    CollectionModel<PrzewozDTO> getPrzewozyByParams(Integer trasaId, Integer autobusId);
+    
     PrzewozDTO getPrzewoz(Integer id);
 
     ResponseEntity<?> createPrzewoz(PrzewozDTO dto);
