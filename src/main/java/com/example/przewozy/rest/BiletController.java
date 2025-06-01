@@ -3,6 +3,7 @@ package com.example.przewozy.rest;
 import com.example.przewozy.assembler.BiletModelAssembler;
 import com.example.przewozy.dto.BiletDTO;
 import com.example.przewozy.entity.Bilet;
+import com.example.przewozy.enums.StatusBiletu;
 import com.example.przewozy.service.BiletService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -52,6 +53,14 @@ public class BiletController {
             @PathVariable Long id,
             @Valid @RequestBody BiletDTO dto) {
         return biletService.update(id, dto);
+    }
+
+    @Operation(summary = "Zmień status biletu.")
+    @PatchMapping("/{id}")
+    public BiletDTO patchBilet(
+            @PathVariable Long id,
+            @Valid @RequestBody StatusBiletu status){
+            return biletService.changeBiletStatus(id, status);
     }
 
     @Operation(summary = "Usuń bilet")

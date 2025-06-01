@@ -9,5 +9,5 @@ public interface KlientService {
     KlientDTO findById(Long id);
     KlientDTO create(KlientDTO dto);
     KlientDTO update(Long id, KlientDTO dto);
-    void delete(Long id);
+    boolean delete(Long id);
 }

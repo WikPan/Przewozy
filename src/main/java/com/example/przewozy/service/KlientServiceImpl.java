@@ -53,7 +53,13 @@ public class KlientServiceImpl implements KlientService {
     }
 
     @Override
-    public void delete(Long id) {
-        klientRepo.deleteById(id);
+    public boolean delete(Long id) {
+        Klient k = klientRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Klient nie znaleziony: " + id));
+        if(k.getBilety()!=null) return false;
+        else {
+            klientRepo.deleteById(id);
+            return true;
+        }
     }
 }

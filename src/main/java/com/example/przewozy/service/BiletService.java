@@ -4,6 +4,7 @@ import com.example.przewozy.dto.BiletDTO;
 import com.example.przewozy.dto.KlientDTO;
 import com.example.przewozy.dto.PrzewozDTO;
 import com.example.przewozy.entity.Bilet;
+import com.example.przewozy.enums.StatusBiletu;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ public interface BiletService {
     BiletDTO getById(Long id);
     BiletDTO create(BiletDTO dto);
     BiletDTO update(Long id, BiletDTO dto);
+    BiletDTO changeBiletStatus(Long id, StatusBiletu status);
     void delete(Long id);
     KlientDTO getKlientForBilet(Long id);
     PrzewozDTO getPrzewozForBilet(Long id);

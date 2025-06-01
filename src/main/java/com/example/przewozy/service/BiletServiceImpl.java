@@ -6,6 +6,8 @@ import com.example.przewozy.dto.PrzewozDTO;
 import com.example.przewozy.entity.Bilet;
 import com.example.przewozy.entity.Klient;
 import com.example.przewozy.entity.Przewoz;
+import com.example.przewozy.enums.StatusBiletu;
+import com.example.przewozy.exception.InvalidRequestException;
 import com.example.przewozy.exception.ResourceNotFoundException;
 import com.example.przewozy.repo.BiletRepository;
 import com.example.przewozy.repo.KlientRepository;
@@ -13,7 +15,9 @@ import com.example.przewozy.repo.PrzewozRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +45,10 @@ public class BiletServiceImpl implements BiletService {
             .orElseThrow(() -> new ResourceNotFoundException("Klient nie istnieje: " + dto.getKlientId()));
         Przewoz przewoz = przewozRepo.findById(dto.getPrzewozId())
             .orElseThrow(() -> new ResourceNotFoundException("Przewóz nie istnieje: " + dto.getPrzewozId()));
+
+        if (przewoz.getData().isBefore(LocalDate.now())) {
+            throw new InvalidRequestException("Nie można kupić biletu na przeszły przejazd.");
+        }
 
         Bilet bilet = new Bilet();
         bilet.setKlient(klient);
@@ -73,6 +81,16 @@ public class BiletServiceImpl implements BiletService {
         bilet.setMiejsce(dto.getMiejsce());
         bilet.setCena(dto.getCena());
         bilet.setStatus(dto.getStatus());
+
+        Bilet updated = biletRepo.save(bilet);
+        return new BiletDTO(updated);
+    }
+
+    @Override
+    public BiletDTO changeBiletStatus(Long id, StatusBiletu status){
+        Bilet bilet = biletRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bilet nie znaleziony: " + id));
+
+        bilet.setStatus(status);
 
         Bilet updated = biletRepo.save(bilet);
         return new BiletDTO(updated);

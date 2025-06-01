@@ -6,10 +6,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/klienci")
@@ -35,7 +38,7 @@ public class KlientRestController {
     @PostMapping
     public ResponseEntity<KlientDTO> create(@RequestBody @Valid KlientDTO klientDTO) {
         KlientDTO created = klientService.create(klientDTO);
-        return ResponseEntity.ok(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @Operation(summary = "Zaktualizuj dane klienta")
@@ -48,8 +51,16 @@ public class KlientRestController {
 
     @Operation(summary = "Usuń klienta")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        klientService.delete(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Map<String, String>> delete(@PathVariable Long id) {
+        Map<String, String> response = new HashMap<>();
+
+        if (klientService.delete(id)) {
+            response.put("message", "Klient został usunięty.");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } else {
+            response.put("message", "Klient posiada bilety, nie można usunąć.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
+
 }

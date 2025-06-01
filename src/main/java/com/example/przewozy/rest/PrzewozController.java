@@ -7,7 +7,6 @@ import com.example.przewozy.entity.Trasa;
 import com.example.przewozy.service.PrzewozService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
@@ -22,10 +21,10 @@ public class PrzewozController {
     @Autowired
     private PrzewozService przewozService;
 
-    @PostConstruct
-    private void generateData() {
-        przewozService.generateData();
-    }
+//    @PostConstruct
+//    private void generateData() {
+//        przewozService.generateData();
+//    }
 
     @Operation(summary = "Pobierz listę przewozów, z opcjonalnym filtrowaniem po trasie lub autobusie")
     @GetMapping

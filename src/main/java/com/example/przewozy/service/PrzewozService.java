@@ -7,10 +7,8 @@ import com.example.przewozy.entity.Trasa;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
 
-import java.util.List;
-
 public interface PrzewozService {
-    void generateData();
+    //void generateData();
 
     CollectionModel<PrzewozDTO> getPrzewozy();
 
