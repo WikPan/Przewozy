@@ -5,15 +5,18 @@ import lombok.*;
 
 import java.util.List;
 
-@Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = "bilety")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Entity
 public class Klient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     private String imie;
     private String nazwisko;

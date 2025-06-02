@@ -1,0 +1,496 @@
+{
+  "info": {
+    "name": "Projekt Spring Boot API z testami",
+    "_postman_id": "123e4567-e89b-12d3-a456-426614174001",
+    "description": "Kolekcja testów dla API Spring Boot - klienci, bilety, przewozy, autobusy, trasy z prostymi testami",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Klienci",
+      "item": [
+        {
+          "name": "Dodanie nowego klienta - poprawne dane",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "http://localhost:8080/klienci",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["klienci"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"imie\":\"Jan\",\"nazwisko\":\"Kowalski\",\"email\":\"jan.kowalski@gmail.com\",\"telefon\":\"123456789\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Response has client ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Dodanie klienta z nieprawidłowym emailem",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "http://localhost:8080/klienci",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["klienci"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"imie\":\"Jan\",\"nazwisko\":\"Kowalski\",\"email\":\"jan.kowalski#gmail.com\",\"telefon\":\"123456789\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response has error message\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error || jsonData.message).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Usunięcie klienta z biletami",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "http://localhost:8080/klienci/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["klienci", "1"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 or 409\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400,409]);",
+                  "});",
+                  "pm.test(\"Response has error or message\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error || jsonData.message).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Bilety",
+      "item": [
+        {
+          "name": "Zakup biletu przez klienta",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "http://localhost:8080/bilety",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["bilety"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\": 1,\"klientId\": 1,\"przewozId\": 1,\"miejsce\": \"string\",\"cena\": 100,\"status\": \"AKTYWNY\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Response has ticket ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Zakup biletu na przeszły przejazd",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "http://localhost:8080/bilety",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["bilety"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\":1,\"klientId\":1,\"przewozId\":2,\"miejsce\":5,\"cena\":40,\"status\":\"AKTYWNY\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response has error message\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error || jsonData.message).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Anulowanie biletu",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "http://localhost:8080/bilety/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["bilety", "1"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "\"ANULOWANY\""
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Status changed to ANULOWANY\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql(\"ANULOWANY\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Przewozy",
+      "item": [
+        {
+          "name": "Dodanie nowego przewozu",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "http://localhost:8080/przewozy",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["przewozy"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"data\":\"2025-06-05\",\"godzina\":\"14:30\",\"autobusId\":1,\"trasaId\":1}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Response has przewoz ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Dodanie przewozu z nieistniejącym autobusem",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "http://localhost:8080/przewozy",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["przewozy"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"data\":\"2025-06-05\",\"godzina\":\"14:30\",\"idAutobusu\":999,\"idTrasy\":2}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response has error message\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error || jsonData.message).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Autobusy",
+      "item": [
+        {
+          "name": "Dodanie autobusu z ujemną liczbą miejsc",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "http://localhost:8080/autobusy",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["autobusy"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"liczbaMiejsc\":-10,\"marka\":\"Mercedes\",\"model\":\"Sprinter\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response has error message\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error || jsonData.message).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Trasy",
+      "item": [
+        {
+          "name": "Dodanie trasy z tym samym miastem początkowym i docelowym",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "http://localhost:8080/trasy",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["trasy"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"miastoPoczatkowe\":\"Warszawa\",\"miastoDocelowe\":\"Warszawa\",\"dystans\":100}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response has validation error\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error || jsonData.message).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Dodanie trasy z dystansem 0 km",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "http://localhost:8080/trasy",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["trasy"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"miastoPoczatkowe\":\"Warszawa\",\"miastoDocelowe\":\"Krakow\",\"dystans\":0}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response has validation error\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error || jsonData.message).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Relacje i raportowanie",
+      "item": [
+        {
+          "name": "Wyświetlenie biletów klienta",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/klienci/1/bilety",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["klienci", "1", "bilety"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response has list of bilety\", function () {",
+                  "  var jsonData = pm.response.json();",
+                  "  pm.expect(jsonData._embedded).to.exist;",
+                  "  pm.expect(jsonData._embedded.biletDTOList).to.exist;",
+                  "});"
+
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Wyświetlenie szczegółów przewozu",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/przewozy/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["przewozy", "1"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response contains autobus and trasa info\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData._links.autobus).to.exist;",
+                  "    pm.expect(jsonData._links.trasa).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    }
+  ]
+}

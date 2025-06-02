@@ -7,21 +7,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ExistsInDatabaseValidator implements ConstraintValidator<ExistsInDatabase, Integer> {
+public class ExistsInDatabaseValidator
+    implements ConstraintValidator<ExistsInDatabase, Object> {
+
     @Autowired
     private EntityManager entityManager;
 
     private Class<?> entityClass;
 
     @Override
-    public void initialize(ExistsInDatabase constraintAnnotation){
+    public void initialize(ExistsInDatabase constraintAnnotation) {
         this.entityClass = constraintAnnotation.entity();
     }
 
     @Override
-    public boolean isValid(Integer value, ConstraintValidatorContext context){
-        if (value==null){
-            return true; //null osobno przez @NotNull
+    public boolean isValid(Object value, ConstraintValidatorContext context) {
+        if (value == null) {
+            return true;
         }
         return entityManager.find(entityClass, value) != null;
     }

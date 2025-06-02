@@ -1,81 +1,84 @@
 package com.example.przewozy.rest;
 
+import com.example.przewozy.assembler.TrasaModelAssembler;
 import com.example.przewozy.dto.PrzewozDTO;
 import com.example.przewozy.dto.TrasaDTO;
+import com.example.przewozy.entity.Przewoz;
 import com.example.przewozy.entity.Trasa;
-import com.example.przewozy.repo.TrasaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.przewozy.service.TrasaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.http.HttpStatus;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
 @RequestMapping("/trasy")
+@RequiredArgsConstructor
+@Validated
+@Tag(name = "Trasy", description = "Operacje na trasach przejazdów")
 public class TrasaController {
 
-    @Autowired
-    private TrasaRepository trasaRepo;
+    private final TrasaService trasaService;
+    private final TrasaModelAssembler assembler;
 
+    @Operation(summary = "Pobierz listę wszystkich tras")
     @GetMapping
-    public CollectionModel<TrasaDTO> getTrasy(){
-        List<TrasaDTO> trasyDTO = new ArrayList<>();
-        for(Trasa trasa: trasaRepo.findAll())
-            trasyDTO.add(new TrasaDTO(trasa));
-        return CollectionModel.of(trasyDTO);
+    public CollectionModel<TrasaDTO> getTrasy() {
+        List<Trasa> all = trasaService.findAll();
+        return assembler.toCollectionModel(all);
     }
 
+    @Operation(summary = "Pobierz trasę po ID")
     @GetMapping("/{id}")
-    public TrasaDTO getTrasa(@PathVariable Integer id){
-        Trasa t = trasaRepo.findById(id).orElse(null);
-        return new TrasaDTO(t);
+    public EntityModel<TrasaDTO> getTrasa(@PathVariable Integer id) {
+        Trasa t = trasaService.findById(id);
+        return EntityModel.of(assembler.toModel(t));
     }
 
+    @Operation(summary = "Utwórz nową trasę")
     @PostMapping
-    public ResponseEntity<?> createTrasa(@RequestBody Trasa przewoz ){
-        przewoz = trasaRepo.save(przewoz);
-        return ResponseEntity.ok("Dodano przewóz");
+    public ResponseEntity<String> createTrasa(@Valid @RequestBody Trasa trasa) {
+        trasaService.create(trasa);
+        return ResponseEntity.ok("Dodano trasę");
     }
 
+    @Operation(summary = "Zaktualizuj istniejącą trasę")
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateTrasa(
+            @PathVariable Integer id,
+            @Valid @RequestBody Trasa trasa
+    ) {
+        trasaService.update(id, trasa);
+        return ResponseEntity.ok("Zaktualizowano trasę");
+    }
+
+    @Operation(summary = "Usuń trasę po ID")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteTrasa(@PathVariable Integer id) {
+        trasaService.delete(id);
+        return ResponseEntity.ok("Usunięto trasę");
+    }
+
+    @Operation(summary = "Pobierz przewozy przypisane do trasy")
     @GetMapping("/{id}/przewozy")
     public CollectionModel<PrzewozDTO> getPrzewozyForTrasa(@PathVariable Integer id) {
-        Trasa trasa = trasaRepo.findById(id).orElse(null);
-        if (trasa == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Autobus nie znaleziony");
-        }
-
-        List<PrzewozDTO> przewozyDTO = trasa.getPrzewozy().stream()
-                .map(PrzewozDTO::new)
-                .collect(Collectors.toList());
-
-        return CollectionModel.of(przewozyDTO);
+        List<Przewoz> list = trasaService.getPrzewozyForTrasa(id);
+        var dtos = list.stream().map(PrzewozDTO::new).collect(Collectors.toList());
+        return CollectionModel.of(
+                dtos,
+                linkTo(methodOn(TrasaController.class).getPrzewozyForTrasa(id)).withSelfRel(),
+                linkTo(methodOn(TrasaController.class).getTrasa(id)).withRel("trasa")
+        );
     }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateTrasa(@PathVariable Integer id, @RequestBody Trasa updatedTrasa) {
-        return trasaRepo.findById(id).map(trasa -> {
-            trasa.setPunktStartowy(updatedTrasa.getPunktStartowy());
-            trasa.setPunktDocelowy(updatedTrasa.getPunktDocelowy());
-            trasa.setDystansKm(updatedTrasa.getDystansKm());
-
-            trasaRepo.save(trasa);
-            return ResponseEntity.ok("Zaktualizowano trasę o id: " + id);
-        }).orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTrasa(@PathVariable Integer id) {
-        if (trasaRepo.existsById(id)) {
-            trasaRepo.deleteById(id);
-            return ResponseEntity.ok("Usunięto trasę o id: " + id);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
 }

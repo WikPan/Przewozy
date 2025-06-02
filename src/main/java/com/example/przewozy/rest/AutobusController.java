@@ -1,82 +1,95 @@
 package com.example.przewozy.rest;
 
+import com.example.przewozy.assembler.AutobusModelAssembler;
 import com.example.przewozy.dto.AutobusDTO;
 import com.example.przewozy.dto.PrzewozDTO;
 import com.example.przewozy.entity.Autobus;
-import com.example.przewozy.repo.AutobusRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.przewozy.entity.Przewoz;
+import com.example.przewozy.service.AutobusService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.http.HttpStatus;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+
 @RestController
 @RequestMapping("/autobusy")
+@RequiredArgsConstructor
+@Tag(name = "Autobusy", description = "Operacje na autobusach")
+@Validated
 public class AutobusController {
 
-    @Autowired
-    private AutobusRepository autoRepo;
+    private final AutobusService autobusService;
+    private final AutobusModelAssembler assembler;
 
+    @Operation(summary = "Lista wszystkich autobusów (opcjonalnie filtrowana po marce)")
     @GetMapping
-    public CollectionModel<AutobusDTO> getAutobusy(){
-        List<AutobusDTO> autobusyDTO = new ArrayList<>();
-        for(Autobus przewoz: autoRepo.findAll())
-            autobusyDTO.add(new AutobusDTO(przewoz));
-        return CollectionModel.of(autobusyDTO);
-    }
+    public CollectionModel<AutobusDTO> getAllAutobusy(
+        @RequestParam(value = "marka", required = false) String marka) {
 
-    @GetMapping("/{id}")
-    public AutobusDTO getAutobus(@PathVariable Integer id){
-        Autobus a = autoRepo.findById(id).orElse(null);
-        return new AutobusDTO(a);
-    }
-
-    @PostMapping
-    public ResponseEntity<?> createAutobus(@RequestBody Autobus autobus ){
-        autobus = autoRepo.save(autobus);
-        return ResponseEntity.ok("Dodano autobus");
-    }
-
-    @GetMapping("/{id}/przewozy")
-    public CollectionModel<PrzewozDTO> getPrzewozyForAutobus(@PathVariable Integer id) {
-        Autobus autobus = autoRepo.findById(id).orElse(null);
-        if (autobus == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Autobus nie znaleziony");
-        }
-
-        List<PrzewozDTO> przewozyDTO = autobus.getPrzewozy().stream()
-                .map(PrzewozDTO::new)
+        List<Autobus> wyniki = (marka == null)
+            ? autobusService.getAllAutobusy()
+            : autobusService.getAllAutobusy().stream()
+                .filter(a -> a.getMarka().equalsIgnoreCase(marka))
                 .collect(Collectors.toList());
 
-        return CollectionModel.of(przewozyDTO);
+        return assembler.toCollectionModel(wyniki);
     }
 
+    @Operation(summary = "Pobierz pojedynczy autobus po ID")
+    @GetMapping("/{id}")
+    public EntityModel<AutobusDTO> getAutobusById(@PathVariable Integer id) {
+        Autobus a = autobusService.getAutobusById(id);
+        return EntityModel.of(assembler.toModel(a));
+    }
+
+    @Operation(summary = "Utwórz nowy autobus")
+    @PostMapping
+    public ResponseEntity<?> createAutobus(@Valid @RequestBody Autobus autobus) {
+        Autobus saved = autobusService.createAutobus(autobus);
+        AutobusDTO dto = assembler.toModel(saved);
+        return ResponseEntity
+            .created(dto.getRequiredLink("self").toUri())
+            .body(dto);
+    }
+
+    @Operation(summary = "Zaktualizuj istniejący autobus")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateAutobus(@PathVariable Integer id, @RequestBody Autobus updatedAutobus) {
-        return autoRepo.findById(id).map(autobus -> {
-            autobus.setMarka(updatedAutobus.getMarka());
-            autobus.setModel(updatedAutobus.getModel());
-            autobus.setLiczbaMiejsc(updatedAutobus.getLiczbaMiejsc());
-            autobus.setRokProdukcji(updatedAutobus.getRokProdukcji());
+    public ResponseEntity<?> updateAutobus(
+        @PathVariable Integer id,
+        @Valid @RequestBody Autobus updated) {
 
-            autoRepo.save(autobus);
-            return ResponseEntity.ok("Zaktualizowano autobus o id: " + id);
-        }).orElseGet(() -> ResponseEntity.notFound().build());
+        Autobus a = autobusService.updateAutobus(id, updated);
+        return ResponseEntity.ok(assembler.toModel(a));
     }
 
+    @Operation(summary = "Usuń autobus")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAutobus(@PathVariable Integer id) {
-        if (autoRepo.existsById(id)) {
-            autoRepo.deleteById(id);
-            return ResponseEntity.ok("Usunięto autobus o id: " + id);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        autobusService.deleteAutobus(id);
+        return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Pobierz wszystkie przewozy dla danego autobusu")
+    @GetMapping("/{id}/przewozy")
+    public CollectionModel<PrzewozDTO> getPrzewozyForAutobus(@PathVariable Integer id) {
+        List<Przewoz> przewozy = autobusService.getPrzewozyForAutobus(id);
+        List<PrzewozDTO> dtos = przewozy.stream()
+            .map(PrzewozDTO::new)
+            .collect(Collectors.toList());
+
+        return CollectionModel.of(dtos,
+            linkTo(methodOn(AutobusController.class).getPrzewozyForAutobus(id)).withSelfRel(),
+            linkTo(methodOn(AutobusController.class).getAutobusById(id)).withRel("autobus")
+        );
+    }
 }
