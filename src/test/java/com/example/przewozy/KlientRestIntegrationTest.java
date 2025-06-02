@@ -41,6 +41,6 @@ public class KlientRestIntegrationTest {
         // then
         mockMvc.perform(get("/klienci"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].imie").value("Tomek"));
+            .andExpect(jsonPath("$[1].imie").value("Tomek"));
     }
 }

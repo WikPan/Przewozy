@@ -72,12 +72,14 @@ class KlientRestControllerTest {
     }
 
     @Test
-    void testDelete() throws Exception {
-        doNothing().when(klientService).delete(1);
+    void testDelete_shouldReturnOk_whenClientDeleted() throws Exception {
+        when(klientService.delete(1)).thenReturn(true);
 
         mockMvc.perform(delete("/klienci/{id}", 1))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Klient został usunięty."));
 
         verify(klientService, times(1)).delete(1);
     }
+
 }

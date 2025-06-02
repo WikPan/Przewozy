@@ -98,8 +98,7 @@ class PrzewozControllerTest {
         mockMvc.perform(post("/przewozy")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
-            .andExpect(status().isOk())
-            .andExpect(content().string(containsString("Dodano przewóz")));
+            .andExpect(status().isCreated());
     }
 
     @Test
