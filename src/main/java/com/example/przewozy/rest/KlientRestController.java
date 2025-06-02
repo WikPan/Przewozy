@@ -1,11 +1,16 @@
 package com.example.przewozy.rest;
 
+import com.example.przewozy.dto.BiletDTO;
 import com.example.przewozy.dto.KlientDTO;
+import com.example.przewozy.dto.PrzewozDTO;
+import com.example.przewozy.entity.Bilet;
+import com.example.przewozy.entity.Przewoz;
 import com.example.przewozy.service.KlientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +18,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/klienci")
@@ -30,7 +39,7 @@ public class KlientRestController {
 
     @Operation(summary = "Pobierz klienta po ID")
     @GetMapping("/{id}")
-    public ResponseEntity<KlientDTO> getById(@PathVariable Long id) {
+    public ResponseEntity<KlientDTO> getById(@PathVariable Integer id) {
         return ResponseEntity.ok(klientService.findById(id));
     }
 
@@ -43,7 +52,7 @@ public class KlientRestController {
 
     @Operation(summary = "Zaktualizuj dane klienta")
     @PutMapping("/{id}")
-    public ResponseEntity<KlientDTO> update(@PathVariable Long id,
+    public ResponseEntity<KlientDTO> update(@PathVariable Integer id,
                                             @RequestBody @Valid KlientDTO klientDTO) {
         KlientDTO updated = klientService.update(id, klientDTO);
         return ResponseEntity.ok(updated);
@@ -51,7 +60,7 @@ public class KlientRestController {
 
     @Operation(summary = "Usuń klienta")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> delete(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> delete(@PathVariable Integer id) {
         Map<String, String> response = new HashMap<>();
 
         if (klientService.delete(id)) {
@@ -63,4 +72,17 @@ public class KlientRestController {
         }
     }
 
+    @Operation(summary = "Pobierz wszystkie przewozy dla danego autobusu")
+    @GetMapping("/{id}/bilety")
+    public CollectionModel<BiletDTO> getBiletyForKlient(@PathVariable Integer id) {
+        List<Bilet> przewozy = klientService.getBiletyForKlient(id);
+        List<BiletDTO> dtos = przewozy.stream()
+                .map(BiletDTO::new)
+                .collect(Collectors.toList());
+
+        return CollectionModel.of(dtos,
+                linkTo(methodOn(KlientRestController.class).getBiletyForKlient(id)).withSelfRel(),
+                linkTo(methodOn(KlientRestController.class).getById(id)).withRel("autobus")
+        );
+    }
 }

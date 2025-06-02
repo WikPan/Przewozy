@@ -24,8 +24,6 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
-        System.out.println(">>> Ładowanie danych testowych...");
-
         // Autobus
         Autobus autobus = new Autobus();
         autobus.setMarka("Mercedes");

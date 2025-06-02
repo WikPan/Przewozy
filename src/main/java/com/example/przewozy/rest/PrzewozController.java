@@ -1,5 +1,6 @@
 package com.example.przewozy.rest;
 
+import com.example.przewozy.dto.BiletDTO;
 import com.example.przewozy.dto.PrzewozDTO;
 import com.example.przewozy.entity.Autobus;
 import com.example.przewozy.entity.Przewoz;
@@ -13,6 +14,8 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+
 @RestController
 @RequestMapping("/przewozy")
 @Tag(name = "Przewozy", description = "Operacje na przewozach")
@@ -20,11 +23,6 @@ public class PrzewozController {
 
     @Autowired
     private PrzewozService przewozService;
-
-//    @PostConstruct
-//    private void generateData() {
-//        przewozService.generateData();
-//    }
 
     @Operation(summary = "Pobierz listę przewozów, z opcjonalnym filtrowaniem po trasie lub autobusie")
     @GetMapping
@@ -43,7 +41,10 @@ public class PrzewozController {
     @Operation(summary = "Utwórz nowy przewóz")
     @PostMapping
     public ResponseEntity<?> createPrzewoz(@Valid @RequestBody PrzewozDTO dto) {
-        return przewozService.createPrzewoz(dto);
+        PrzewozDTO created = przewozService.createPrzewoz(dto);
+        return ResponseEntity
+                .created(URI.create("/bilety/" + created.getId()))
+                .body(created);
     }
 
     @Operation(summary = "Pobierz autobus przypisany do danego przewozu")

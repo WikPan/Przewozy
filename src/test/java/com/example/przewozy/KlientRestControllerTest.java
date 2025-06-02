@@ -43,7 +43,7 @@ class KlientRestControllerTest {
     @Test
     void testCreate() throws Exception {
         KlientDTO dto = new KlientDTO("Anna", "Nowak", "987654321", "anna@nowak.pl");
-        when(klientService.create(any())).thenReturn(new KlientDTO(1L, "Anna","Nowak","987654321","anna@nowak.pl"));
+        when(klientService.create(any())).thenReturn(new KlientDTO(1, "Anna","Nowak","987654321","anna@nowak.pl"));
 
         mockMvc.perform(post("/klienci")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -57,7 +57,7 @@ class KlientRestControllerTest {
 
     @Test
     void testUpdate() throws Exception {
-        Long id = 1L;
+        Integer id = 1;
         KlientDTO dto = new KlientDTO("Edyta","Zmiana","111222333","edyta@zmiana.pl");
         when(klientService.update(eq(id), any()))
             .thenReturn(new KlientDTO(id,"Edyta","Zmiana","111222333","edyta@zmiana.pl"));
@@ -73,11 +73,11 @@ class KlientRestControllerTest {
 
     @Test
     void testDelete() throws Exception {
-        doNothing().when(klientService).delete(1L);
+        doNothing().when(klientService).delete(1);
 
-        mockMvc.perform(delete("/klienci/{id}", 1L))
+        mockMvc.perform(delete("/klienci/{id}", 1))
                 .andExpect(status().isNoContent());
 
-        verify(klientService, times(1)).delete(1L);
+        verify(klientService, times(1)).delete(1);
     }
 }

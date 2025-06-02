@@ -34,7 +34,7 @@ public class BiletController {
 
     @Operation(summary = "Pobierz bilet po ID")
     @GetMapping("/{id}")
-    public BiletDTO getBilet(@PathVariable Long id) {
+    public BiletDTO getBilet(@PathVariable Integer id) {
         return biletService.getById(id);
     }
 
@@ -50,7 +50,7 @@ public class BiletController {
     @Operation(summary = "Zaktualizuj bilet")
     @PutMapping("/{id}")
     public BiletDTO updateBilet(
-            @PathVariable Long id,
+            @PathVariable Integer id,
             @Valid @RequestBody BiletDTO dto) {
         return biletService.update(id, dto);
     }
@@ -58,7 +58,7 @@ public class BiletController {
     @Operation(summary = "Zmień status biletu.")
     @PatchMapping("/{id}")
     public BiletDTO patchBilet(
-            @PathVariable Long id,
+            @PathVariable Integer id,
             @Valid @RequestBody StatusBiletu status){
             return biletService.changeBiletStatus(id, status);
     }
@@ -66,19 +66,19 @@ public class BiletController {
     @Operation(summary = "Usuń bilet")
     @DeleteMapping("/{id}")
     @ResponseStatus(code = org.springframework.http.HttpStatus.NO_CONTENT)
-    public void deleteBilet(@PathVariable Long id) {
+    public void deleteBilet(@PathVariable Integer id) {
         biletService.delete(id);
     }
 
     @Operation(summary = "Pobierz klienta przypisanego do biletu")
     @GetMapping("/{id}/klient")
-    public Object getKlientForBilet(@PathVariable Long id) {
+    public Object getKlientForBilet(@PathVariable Integer id) {
         return biletService.getKlientForBilet(id);
     }
 
     @Operation(summary = "Pobierz przewóz przypisany do biletu")
     @GetMapping("/{id}/przewoz")
-    public Object getPrzewozForBilet(@PathVariable Long id) {
+    public Object getPrzewozForBilet(@PathVariable Integer id) {
         return biletService.getPrzewozForBilet(id);
     }
 }

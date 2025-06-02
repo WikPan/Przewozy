@@ -16,7 +16,7 @@ public interface PrzewozService {
     
     PrzewozDTO getPrzewoz(Integer id);
 
-    ResponseEntity<?> createPrzewoz(PrzewozDTO dto);
+    PrzewozDTO createPrzewoz(PrzewozDTO dto);
 
     Autobus getAutobusForPrzewoz(Integer id);
 

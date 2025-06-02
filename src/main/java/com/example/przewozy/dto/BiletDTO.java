@@ -16,11 +16,11 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @NoArgsConstructor
 public class BiletDTO extends RepresentationModel<BiletDTO> {
 
-    private Long id;
+    private Integer id;
 
     @NotNull(message = "klientId nie może być nullem")
     @ExistsInDatabase(entity = com.example.przewozy.entity.Klient.class, message = "Klient nie istnieje")
-    private Long klientId;
+    private Integer klientId;
 
     @NotNull(message = "przewozId nie może być nullem")
     @ExistsInDatabase(entity = com.example.przewozy.entity.Przewoz.class, message = "Przewóz nie istnieje")
@@ -35,7 +35,7 @@ public class BiletDTO extends RepresentationModel<BiletDTO> {
     @NotNull(message = "status nie może być pusty")
     private StatusBiletu status;
 
-    public BiletDTO(Long klientId, Integer przewozId, String miejsce, Integer cena, StatusBiletu status) {
+    public BiletDTO(Integer klientId, Integer przewozId, String miejsce, Integer cena, StatusBiletu status) {
         this.klientId = klientId;
         this.przewozId = przewozId;
         this.miejsce = miejsce;

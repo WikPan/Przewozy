@@ -1,8 +1,12 @@
 package com.example.przewozy.service;
 
 import com.example.przewozy.dto.KlientDTO;
+import com.example.przewozy.entity.Bilet;
 import com.example.przewozy.entity.Klient;
+import com.example.przewozy.entity.Przewoz;
+import com.example.przewozy.repo.BiletRepository;
 import com.example.przewozy.repo.KlientRepository;
+import com.example.przewozy.repo.PrzewozRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +18,7 @@ import java.util.stream.Collectors;
 public class KlientServiceImpl implements KlientService {
 
     private final KlientRepository klientRepo;
+    private final BiletRepository biletRepo;
 
     @Override
     public List<KlientDTO> findAll() {
@@ -23,7 +28,7 @@ public class KlientServiceImpl implements KlientService {
     }
 
     @Override
-    public KlientDTO findById(Long id) {
+    public KlientDTO findById(Integer id) {
         Klient k = klientRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Klient nie znaleziony: " + id));
         return new KlientDTO(k);
@@ -41,7 +46,7 @@ public class KlientServiceImpl implements KlientService {
     }
 
     @Override
-    public KlientDTO update(Long id, KlientDTO dto) {
+    public KlientDTO update(Integer id, KlientDTO dto) {
         Klient k = klientRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Klient nie znaleziony: " + id));
         k.setImie(dto.getImie());
@@ -53,7 +58,7 @@ public class KlientServiceImpl implements KlientService {
     }
 
     @Override
-    public boolean delete(Long id) {
+    public boolean delete(Integer id) {
         Klient k = klientRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Klient nie znaleziony: " + id));
         if(k.getBilety()!=null) return false;
@@ -61,5 +66,11 @@ public class KlientServiceImpl implements KlientService {
             klientRepo.deleteById(id);
             return true;
         }
+    }
+
+    @Override
+    public List<Bilet> getBiletyForKlient(Integer id) {
+        findById(id);
+        return biletRepo.findByKlientId(id);
     }
 }

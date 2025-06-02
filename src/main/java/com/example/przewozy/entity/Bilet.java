@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class Bilet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "klient_id")

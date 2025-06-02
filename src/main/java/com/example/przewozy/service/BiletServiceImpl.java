@@ -33,7 +33,7 @@ public class BiletServiceImpl implements BiletService {
     }
 
     @Override
-    public BiletDTO getById(Long id) {
+    public BiletDTO getById(Integer id) {
         Bilet b = biletRepo.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Bilet nie znaleziony: " + id));
         return new BiletDTO(b);
@@ -62,7 +62,7 @@ public class BiletServiceImpl implements BiletService {
     }
 
     @Override
-    public BiletDTO update(Long id, BiletDTO dto) {
+    public BiletDTO update(Integer id, BiletDTO dto) {
         Bilet bilet = biletRepo.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Bilet nie znaleziony: " + id));
 
@@ -87,7 +87,7 @@ public class BiletServiceImpl implements BiletService {
     }
 
     @Override
-    public BiletDTO changeBiletStatus(Long id, StatusBiletu status){
+    public BiletDTO changeBiletStatus(Integer id, StatusBiletu status){
         Bilet bilet = biletRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bilet nie znaleziony: " + id));
 
         bilet.setStatus(status);
@@ -97,7 +97,7 @@ public class BiletServiceImpl implements BiletService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Integer id) {
         if (!biletRepo.existsById(id)) {
             throw new ResourceNotFoundException("Bilet nie znaleziony: " + id);
         }
@@ -105,14 +105,14 @@ public class BiletServiceImpl implements BiletService {
     }
 
     @Override
-    public KlientDTO getKlientForBilet(Long id) {
+    public KlientDTO getKlientForBilet(Integer id) {
         Bilet b = biletRepo.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Bilet nie znaleziony: " + id));
         return new KlientDTO(b.getKlient());
     }
 
     @Override
-    public PrzewozDTO getPrzewozForBilet(Long id) {
+    public PrzewozDTO getPrzewozForBilet(Integer id) {
         Bilet b = biletRepo.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Bilet nie znaleziony: " + id));
         return new PrzewozDTO(b.getPrzewoz());

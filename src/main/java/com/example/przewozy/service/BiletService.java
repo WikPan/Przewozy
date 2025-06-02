@@ -13,11 +13,11 @@ public interface BiletService {
     List<Bilet> getAllEncje();
 
     /** CRUD i relacje rzucają 404 przez ResourceNotFoundException */
-    BiletDTO getById(Long id);
+    BiletDTO getById(Integer id);
     BiletDTO create(BiletDTO dto);
-    BiletDTO update(Long id, BiletDTO dto);
-    BiletDTO changeBiletStatus(Long id, StatusBiletu status);
-    void delete(Long id);
-    KlientDTO getKlientForBilet(Long id);
-    PrzewozDTO getPrzewozForBilet(Long id);
+    BiletDTO update(Integer id, BiletDTO dto);
+    BiletDTO changeBiletStatus(Integer id, StatusBiletu status);
+    void delete(Integer id);
+    KlientDTO getKlientForBilet(Integer id);
+    PrzewozDTO getPrzewozForBilet(Integer id);
 }

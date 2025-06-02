@@ -15,7 +15,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class KlientDTO extends RepresentationModel<KlientDTO> {
-    private Long id;
+    private Integer id;
 
     @NotBlank(message = "Imię nie może być puste")
     @Size(max = 50, message = "Imię może mieć maksymalnie 50 znaków")
