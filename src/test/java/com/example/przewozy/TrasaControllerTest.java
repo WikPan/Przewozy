@@ -1,4 +1,4 @@
-package com.example.przewozy.rest;
+package com.example.przewozy;
 
 import com.example.przewozy.entity.Trasa;
 import com.example.przewozy.repo.TrasaRepository;
